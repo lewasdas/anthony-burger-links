@@ -137,6 +137,10 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
 .field textarea { min-height: 70px; resize: vertical; }
 .send { background: var(--green); color: #fff; border: 0; border-radius: 14px; padding: 16px; font-weight: 900; font-size: 17px; text-align: center; text-decoration: none; display: block; }
 .ghost { background: none; border: 0; color: var(--muted); font-weight: 700; padding: 6px; }
+.ask { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
+.ask > p:first-child { margin: 0; font-weight: 900; font-size: 16px; }
+.ask .err { margin: 0; }
+.send.off { opacity: .45; }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 
 /* ---------- REGISTRO ---------- */
@@ -340,6 +344,14 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
     <label class="field">Tu nombre<input id="f-nombre" autocomplete="name" placeholder="Ej: Martina"></label>
     <label class="field" id="dir-wrap" hidden>Dirección<input id="f-dir" autocomplete="street-address" placeholder="Calle, número, barrio"></label>
     <label class="field">Aclaraciones<textarea id="f-nota" placeholder="Papas o batatas, sin cebolla, sin TACC, etc."></textarea></label>
+    <div class="ask" id="loc-wrap" role="radiogroup" aria-labelledby="loc-q">
+      <p id="loc-q">¿Desde dónde estás pidiendo?</p>
+      <div class="seg">
+        <label><input type="radio" name="local" value="San José">San José</label>
+        <label><input type="radio" name="local" value="Colón">Colón</label>
+      </div>
+      <p class="err" id="loc-err" hidden>Elegí desde dónde pedís para mandarlo al local correcto.</p>
+    </div>
     <a class="send" id="send" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
     <button class="ghost" type="button" id="btn-cerrar">Seguir mirando la carta</button>
   </div>
@@ -347,7 +359,9 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
 
 <script>
 // ====== CONFIG: editá acá precios y productos ======
+// Número de WhatsApp de cada local; el pedido va al de la localidad que elija el cliente
 const WHATSAPP = "5493447514509";
+const LOCALES = { "Colón": WHATSAPP, "San José": "5493447551307" };
 // URL del Apps Script de Google Sheets donde se guardan los registros (ver registro_sheets.gs). Vacío = no guarda.
 const SHEET_URL = "";
 const KIDS = { id: "kids", n: "Anthony Kids + sorpresa", d: "Hasta 12 años. Burger 100 g + cheddar + fritas + gaseosa chica", p: 18500 };
@@ -521,12 +535,25 @@ function message() {
   return [
     "¡Hola Anthony Burger! Quiero hacer este pedido:", "", ...lines, "",
     `*Total: ${money(totals().t)}*`,
+    local() ? `Pido desde: ${local()}` : "",
     `Entrega: ${entrega}${entrega === "Delivery" && dir ? ` — ${dir}` : ""}`,
     nombre ? `Nombre: ${nombre}` : "",
     nota ? `Aclaraciones: ${nota}` : "",
   ].filter((l, i, a) => l !== "" || (a[i - 1] !== "" && i > 0)).join("\n");
 }
-function refreshSend() { $("#send").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message())}`; }
+function local() { const r = document.querySelector('input[name="local"]:checked'); return r ? r.value : ""; }
+function refreshSend() {
+  const l = local();
+  $("#send").classList.toggle("off", !l);
+  $("#send").href = l ? `https://wa.me/${LOCALES[l]}?text=${encodeURIComponent(message())}` : "#";
+}
+$("#send").addEventListener("click", e => {
+  if (local()) return;
+  e.preventDefault();
+  $("#loc-err").hidden = false;
+  document.querySelector('input[name="local"]').focus();
+});
+document.querySelectorAll('input[name="local"]').forEach(r => r.onchange = () => { $("#loc-err").hidden = true; refreshSend(); });
 function openSheet() {
   const { n } = totals();
   if (!n) { $("#sheet").hidden = true; return; }
