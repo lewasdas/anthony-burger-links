@@ -141,6 +141,9 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
 .ask > p:first-child { margin: 0; font-weight: 900; font-size: 16px; }
 .ask .err { margin: 0; }
 .send.off { opacity: .45; }
+.picks a { border: 1.5px solid var(--line); border-radius: 12px; padding: 16px 12px; text-align: center; font-weight: 900; font-size: 17px; color: var(--fg); text-decoration: none; }
+.picks a:hover { border-color: var(--yellow); color: var(--yellow); }
+#wa-pick .tag { margin-top: -8px; }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 
 /* ---------- REGISTRO ---------- */
@@ -291,7 +294,7 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
       </button>
       <a class="btn" id="lnk-wa" href="https://wa.me/5493447514509?text=Hola%20Anthony%20Burger!" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.3z"/><path d="M9 9.2c.3 2.4 2.3 4.6 5 5.4l1.2-1.2 1.8 1-.6 1.6c-3.9.2-8-3.9-7.8-7.8l1.6-.6 1 1.8z" fill="currentColor" stroke="none"/></svg>
-        <span class="txt">Escribinos por WhatsApp<small>+54 9 3447 51-4509</small></span>
+        <span class="txt">Escribinos por WhatsApp<small>Colón o San José</small></span>
         <span class="arrow">›</span>
       </a>
       <a class="btn" id="lnk-ig" href="https://instagram.com/anthonyburger" target="_blank" rel="noopener">
@@ -309,7 +312,7 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
     <section class="info" aria-label="Datos del local">
       <b>Horario</b><span>Todos los días · 10:00 a 01:00</span>
       <b>Dirección</b><span>Av. San Martín 109, Colón, Entre Ríos</span>
-      <b>WhatsApp</b><span>+54 9 3447 51-4509</span>
+      <b>WhatsApp</b><span>Colón: +54 9 3447 51-4509<br>San José: +54 9 3447 55-1307</span>
     </section>
     <button class="ghost skip" type="button" id="btn-salir">Sumarme al club Anthony</button>
   </div>
@@ -354,6 +357,15 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
     </div>
     <a class="send" id="send" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
     <button class="ghost" type="button" id="btn-cerrar">Seguir mirando la carta</button>
+  </div>
+</div>
+
+<div class="sheet-bg" id="wa-pick" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wa-title">
+    <h2 id="wa-title">¿Desde dónde nos escribís?</h2>
+    <p class="tag">Así te atiende el local que te queda más cerca.</p>
+    <div class="seg picks" id="wa-opts"></div>
+    <button class="ghost" type="button" id="wa-cerrar">Cancelar</button>
   </div>
 </div>
 
@@ -565,6 +577,14 @@ function openSheet() {
 }
 $("#btn-ver-pedido").onclick = openSheet;
 $("#btn-cerrar").onclick = () => { $("#sheet").hidden = true; };
+
+// Botón "Escribinos por WhatsApp": primero pregunta la localidad
+$("#wa-opts").innerHTML = ["San José", "Colón"].map(l =>
+  `<a href="https://wa.me/${LOCALES[l]}?text=${encodeURIComponent("¡Hola Anthony Burger! Les escribo desde " + l + ".")}" target="_blank" rel="noopener">${l}</a>`).join("");
+$("#lnk-wa").addEventListener("click", e => { e.preventDefault(); $("#wa-pick").hidden = false; });
+$("#wa-opts").addEventListener("click", e => { if (e.target.closest("a")) $("#wa-pick").hidden = true; });
+$("#wa-cerrar").onclick = () => { $("#wa-pick").hidden = true; };
+$("#wa-pick").addEventListener("click", e => { if (e.target.id === "wa-pick") $("#wa-pick").hidden = true; });
 $("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("#sheet").hidden = true; });
 document.querySelectorAll('input[name="entrega"]').forEach(r => r.onchange = () => { $("#dir-wrap").hidden = !$("#ent-delivery").checked; refreshSend(); });
 ["#f-nombre", "#f-dir", "#f-nota"].forEach(s => $(s).addEventListener("input", refreshSend));
