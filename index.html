@@ -26,6 +26,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { min-height: 100%; }
 body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
@@ -154,6 +155,91 @@ section.cat { display: flex; flex-direction: column; gap: 4px; scroll-margin-top
 .go { background: var(--yellow); color: var(--on-yellow); border: 0; border-radius: 14px; padding: 18px; font-weight: 900; font-size: 18px; }
 .err { color: var(--tacc); font-size: 13px; margin: -6px 0 0; }
 .skip { align-self: center; }
+
+/* ---------- ESCRITORIO (PC) ---------- */
+@media (min-width: 900px) {
+  body {
+    background:
+      radial-gradient(900px 600px at 0% 0%, rgb(246 198 36 / .09), transparent 60%),
+      radial-gradient(800px 600px at 100% 100%, rgb(232 85 155 / .07), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  body::before { display: none; }
+  .wrap { max-width: 1160px; min-height: 100vh; justify-content: center; padding: 48px 40px 120px; }
+  .wrap > div { width: 100%; margin-inline: auto; }
+
+  /* Registro: tarjeta en dos columnas */
+  #v-registro {
+    display: grid !important; max-width: 980px;
+    grid-template-columns: 1fr 1fr; gap: 28px 64px; align-items: start;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 56px;
+    box-shadow: 0 30px 80px rgb(0 0 0 / .45);
+  }
+  #v-registro[hidden] { display: none !important; }
+  .reg header { grid-column: 1; grid-row: 1; align-items: flex-start; text-align: left; }
+  .reg .logo { width: 240px; }
+  .reg h1 { font-size: 44px; }
+  .reg .tag { font-size: 17px; }
+  .reg .perks { grid-column: 1; grid-row: 2; }
+  .reg form { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .reg .skip { grid-column: 2; grid-row: 3; justify-self: center; }
+
+  /* Inicio: marca a la izquierda, botones a la derecha */
+  #v-inicio {
+    display: grid !important; max-width: 1040px;
+    grid-template-columns: 1fr 1fr; gap: 32px 80px; align-items: center;
+  }
+  #v-inicio[hidden] { display: none !important; }
+  #v-inicio header { grid-column: 1; grid-row: 1; }
+  #v-inicio .logo { width: min(400px, 90%); }
+  #v-inicio .tag { font-size: 18px; }
+  #v-inicio .bun { grid-column: 1; grid-row: 2; justify-self: center; }
+  #v-inicio .info { grid-column: 1; grid-row: 3; font-size: 15px; }
+  #v-inicio nav.links { grid-column: 2; grid-row: 1 / span 3; gap: 14px; }
+  #v-inicio .skip { grid-column: 1 / -1; grid-row: 4; }
+  .btn { padding: 20px 22px; font-size: 18px; transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+  .btn:not(.primary):hover { background: #1f1f1c; transform: translateX(4px); }
+  .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgb(246 198 36 / .25); }
+  .btn .arrow { transition: transform .15s ease, opacity .15s ease; }
+  .btn:hover .arrow { opacity: 1; transform: translateX(3px); }
+
+  /* Carta: índice fijo a la izquierda y productos en dos columnas */
+  #v-carta:not([hidden]) { display: grid !important; }
+  #v-carta {
+    grid-template-columns: 220px 1fr; gap: 24px 48px; align-items: start;
+  }
+  #v-carta .top { grid-column: 1 / -1; }
+  #v-carta .top img { height: 44px; }
+  .back:hover { border-color: var(--yellow); }
+  #v-carta .legend { grid-column: 2; grid-row: 2; }
+  #v-carta .chips {
+    grid-column: 1; grid-row: 2 / span 4; position: sticky; top: 32px;
+    flex-direction: column; overflow: visible; margin: 0; padding: 0; background: none; gap: 6px;
+  }
+  .chip { border-radius: 10px; padding: 10px 14px; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+  .chip:hover { border-color: var(--yellow); }
+  .chip.on { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+  #v-carta .kids { grid-column: 2; padding: 18px 22px; }
+  #v-carta #menu { grid-column: 2; gap: 44px !important; }
+  #v-carta .note { grid-column: 2; }
+  section.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; scroll-margin-top: 32px; }
+  .cat-head { grid-column: 1 / -1; margin-bottom: 4px; }
+  .cat-head h2 { font-size: 32px; }
+  .item, .item:last-child { border-bottom: 1px solid var(--line); padding: 18px 10px; margin-inline: -10px; border-radius: 10px; transition: background .15s ease; }
+  .item:hover { background: var(--surface); }
+  .add, .stepper button { transition: background .15s ease, color .15s ease; }
+  .add:hover, .stepper button:not(.minus):hover { background: var(--yellow); color: var(--on-yellow); }
+
+  /* Pedido: botón flotante y ventana centrada */
+  .bar { left: auto; right: 32px; bottom: 32px; width: 380px; padding: 0; background: none; }
+  .bar button { box-shadow: 0 16px 40px rgb(0 0 0 / .5); }
+  .sheet-bg { align-items: center; }
+  .sheet { max-width: 520px; max-height: 86vh; border-radius: 22px; border: 1px solid var(--line); padding: 28px; }
+}
+@media (min-width: 900px) and (prefers-reduced-motion: reduce) {
+  .btn, .btn .arrow, .chip, .item { transition: none; }
+}
 </style>
 
 <div class="wrap">
@@ -350,6 +436,15 @@ $("#menu").innerHTML = MENU.map(c => {
 }).join("") + `<section class="cat" id="cat-extras" style="--c:var(--fg)"><div class="cat-head"><h2>Extras</h2></div><div class="item"><h3>${esc(EXTRA.n)}</h3><p>Sumale una carne a cualquier burger</p><div class="side"><span class="price">${money(EXTRA.p)}</span>${control("extra")}</div></div></section>`;
 
 Object.keys(catalog).forEach(renderCtl);
+
+// Resalta en el índice la categoría que se está viendo
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    document.querySelectorAll(".chip").forEach(ch => ch.classList.toggle("on", ch.dataset.jump === en.target.id));
+  }), { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("section.cat").forEach(s => io.observe(s));
+}
 
 function totals() {
   let n = 0, t = 0;
